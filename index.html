@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedBook — Hospital Appointments</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #1E88E5;
+  --primary-dark: #0A66C2;
+  --primary-light: #E3F2FD;
+  --primary-mid: #BBDEFB;
+  --accent: #2ECC71;
+  --accent-dark: #27AE60;
+  --accent-light: #E8F8F0;
+  --white: #FFFFFF;
+  --text: #0D2137;
+  --text-muted: #5A7A96;
+  --border: #D6E8FA;
+  --card-shadow: 0 4px 24px rgba(10,102,194,0.08);
+  --card-hover: 0 12px 40px rgba(10,102,194,0.16);
+  --bg: #F0F7FF;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── HEADER ─── */
+header {
+  background: var(--primary-dark);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 16px rgba(10,102,194,0.3);
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-dot {
+  width: 10px; height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(46,204,113,0); }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-tag {
+  background: rgba(255,255,255,0.12);
+  color: #B3D4F5;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+}
+
+/* ─── HERO ─── */
+.hero {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, #42A5F5 100%);
+  padding: 60px 40px 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  top: -200px; right: -100px;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: rgba(46,204,113,0.12);
+  bottom: -80px; left: -50px;
+}
+
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--white);
+  line-height: 1.2;
+  margin-bottom: 12px;
+  position: relative; z-index: 1;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: #90CAF9;
+}
+
+.hero p {
+  color: rgba(255,255,255,0.75);
+  font-size: 1rem;
+  font-weight: 300;
+  position: relative; z-index: 1;
+  margin-bottom: 32px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  position: relative; z-index: 1;
+  flex-wrap: wrap;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.8rem;
+  color: var(--white);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 2px;
+}
+
+/* ─── MAIN CONTENT ─── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+/* ─── SECTION HEADER ─── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  color: var(--primary-dark);
+}
+
+.section-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ─── FILTER TABS ─── */
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 30px;
+  background: var(--white);
+  color: var(--text-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.filter-tab .tab-icon {
+  font-size: 1rem;
+}
+
+.filter-tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.filter-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+  box-shadow: 0 4px 12px rgba(30,136,229,0.3);
+}
+
+/* ─── DOCTOR GRID ─── */
+.doctor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* ─── DOCTOR CARD ─── */
+.doctor-card {
+  background: var(--white);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  animation: fadeUp 0.4s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.doctor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-hover);
+}
+
+.card-top {
+  background: linear-gradient(135deg, var(--primary-light) 0%, #DBEEFF 100%);
+  padding: 28px 20px 20px;
+  text-align: center;
+  position: relative;
+}
+
+.availability-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(46,204,113,0.3);
+}
+
+.doctor-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--white);
+  box-shadow: 0 4px 16px rgba(10,102,194,0.18);
+  margin-bottom: 14px;
+}
+
+.doctor-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15rem;
+  color: var(--primary-dark);
+  margin-bottom: 4px;
+}
+
+.doctor-specialty {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--primary);
+  background: rgba(30,136,229,0.1);
+  padding: 3px 12px;
+  border-radius: 12px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.slots-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.timings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+.slot {
+  padding: 7px 13px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border: 1.5px solid transparent;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.slot:hover:not(.booked) {
+  background: var(--primary-mid);
+  border-color: var(--primary);
+}
+
+.slot.selected {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary-dark);
+  box-shadow: 0 3px 10px rgba(30,136,229,0.3);
+}
+
+.slot.booked {
+  background: #FFF0F0;
+  color: #C0757A;
+  cursor: not-allowed;
+  text-decoration: line-through;
+  opacity: 0.7;
+  font-size: 0.75rem;
+}
+
+.book-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.book-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(46,204,113,0.4);
+}
+
+.book-btn:active {
+  transform: translateY(0);
+}
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,40,80,0.55);
+  backdrop-filter: blur(6px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 500;
+  padding: 20px;
+}
+
+.modal-overlay.open {
+  display: flex;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+
+.modal {
+  background: var(--white);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(10,40,80,0.25);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  padding: 28px 28px 24px;
+  position: relative;
+}
+
+.modal-header h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.modal-slot-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.9);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 20px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px; right: 20px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+
+.modal-close:hover { background: rgba(255,255,255,0.35); }
+
+.modal-body {
+  padding: 28px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(30,136,229,0.12);
+  background: var(--white);
+}
+
+.confirm-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.22s ease;
+  letter-spacing: 0.3px;
+}
+
+.confirm-btn:hover {
+  box-shadow: 0 8px 24px rgba(10,102,194,0.35);
+  transform: translateY(-1px);
+}
+
+/* ─── SUCCESS TOAST ─── */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--text);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  z-index: 1000;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space: nowrap;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast-icon { font-size: 1.2rem; }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--primary-dark);
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  padding: 20px;
+  font-size: 0.8rem;
+}
+
+footer span { color: var(--accent); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+  header { padding: 0 20px; }
+  .hero { padding: 40px 20px 60px; }
+  .container { padding: 30px 16px 50px; }
+  .section-header { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <span class="logo-dot"></span>
+    MedBook
+  </div>
+  <div class="header-right">
+    <span class="header-tag">● Online Booking</span>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Book Your <em>Appointment</em><br>Instantly</h1>
+  <p>Trusted doctors, real-time availability, zero waiting in line.</p>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-num">9+</div>
+      <div class="stat-label">Specialists</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Departments</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Verified</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <div class="section-header">
+    <div>
+      <div class="section-title">Available Doctors</div>
+      <div class="section-subtitle">Select a time slot, then click Book</div>
+    </div>
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="filterDoctors('all', this)">
+        <span class="tab-icon">🏥</span> All
+      </button>
+      <button class="filter-tab" onclick="filterDoctors('general', this)">
+        <span class="tab-icon">🩺</span> General
+      </button>
+      <button class="filter-tab" onclick="filterDoctors('cardiology', this)">
+        <span class="tab-icon">❤️</span> Cardiology
+      </button>
+      <button class="filter-tab" onclick="filterDoctors('orthopedic', this)">
+        <span class="tab-icon">🦴</span> Orthopedic
+      </button>
+    </div>
+  </div>
+
+  <div class="doctor-grid" id="doctorGrid">
+
+    <!-- GENERAL -->
+    <div class="doctor-card" data-category="general">
+      <div class="card-top">
+        <div class="availability-badge">● Available</div>
+        <img class="doctor-avatar" src="https://images.pexels.com/photos/6749778/pexels-photo-6749778.jpeg" alt="Dr. Priya Sharma">
+        <div class="doctor-name">Dr. Priya Sharma</div>
+        <div class="doctor-specialty">🩺 General</div>
+      </div>
+      <div class="card-body">
+        <div class="slots-label">Pick a slot</div>
+        <div class="timings">
+          <span class="slot" onclick="selectSlot(this)">9:00 AM</span>
+          <span class="slot" onclick="selectSlot(this)">9:30 AM</span>
+          <span class="slot booked">10:00 AM</span>
+        </div>
+        <button class="book-btn" onclick="openModal('Dr. Priya Sharma', 'General')">
+          📅 Book Appointment
+        </button>
+      </div>
+    </div>
+
+    <div class="doctor-card" data-category="general">
+      <div class="card-top">
+        <div class="availability-badge">● Available</div>
+        <img class="doctor-avatar" src="https://images.pexels.com/photos/6129688/pexels-photo-6129688.jpeg" alt="Dr. Rahul Verma">
+        <div class="doctor-name">Dr. Rahul Verma</div>
+        <div class="doctor-specialty">🩺 General</div>
+      </div>
+      <div class="card-body">
+        <div class="slots-label">Pick a slot</div>
+        <div class="timings">
+          <span class="slot" onclick="selectSlot(this)">11:00 AM</span>
+          <span class="slot" onclick="selectSlot(this)">11:30 AM</span>
+        </div>
+        <button class="book-btn" onclick="openModal('Dr. Rahul Verma', 'General')">
+          📅 Book Appointment
+        </button>
+      </div>
+    </div>
+
+    <div class="doctor-card" data-category="general">
+      <div class="card-top">
+        <div class="availability-badge">● Available</div>
+        <img class="doctor-avatar" src="https://images.pexels.com/photos/7089401/pexels-photo-7089401.jpeg" alt="Dr. Kavya Reddy">
+        <div class="doctor-name">Dr. Kavya Reddy</div>
+        <div class="doctor-specialty">🩺 General</div>
+      </div>
+      <div class="card-body">
+        <div class="slots-label">Pick a slot</div>
+        <div class="timings">
+          <span class="slot" onclick="selectSlot(this)">2:00 PM</span>
+          <span class="slot" onclick="selectSlot(this)">2:30 PM</span>
+        </div>
+        <button class="book-btn" onclick="openModal('Dr. Kavya Reddy', 'General')">
+          📅 Book Appointment
+        </button>
+      </div>
+    </div>
+
+    <!-- CARDIOLOGY -->
+    <div class="doctor-card" data-category="cardiology">
+      <div class="card-top">
+        <div class="availability-badge">● Available</div>
+        <img class="doctor-avatar" src="https://images.pexels.com/photos/8460157/pexels-photo-8460157.jpeg" alt="Dr. Rajesh Kumar">
+        <div class="doctor-name">Dr. Rajesh Kumar</div>
+        <div class="doctor-specialty">❤️ Cardiology</div>
+      </div>
+      <div class="card-body">
+        <div class="slots-label">Pick a slot</div>
+        <div class="timings">
+          <span class="slot" onclick="selectSlot(this)">10:00 AM</span>
+          <span class="slot" onclick="selectSlot(this)">10:30 AM</span>
+        </div>
+        <button class="book-btn" onclick="openModal('Dr. Rajesh Kumar', 'Cardiology')">
+          📅 Book Appointment
+        </button>
+      </div>
+    </div>
+
+    <div class="doctor-card" data-category="cardiology">
+      <div class="card-top">
+        <div class="availability-badge">● Available</div>
+        <img class="doctor-avatar" src="https://images.pexels.com/photos/8376277/pexels-photo-8376277.jpeg" alt="Dr. Suresh Naidu">
+        <div class="doctor-name">Dr. Suresh Naidu</div>
+        <div class="doctor-specialty">❤️ Cardiology</div>
+      </div>
+      <div class="card-body">
+        <div class="slots-label">Pick a slot</div>
+        <div class="timings">
+          <span class="slot" onclick="selectSlot(this)">1:00 PM</span>
+          <span class="slot" onclick="selectSlot(this)">1:30 PM</span>
+        </div>
+        <button class="book-btn" onclick="openModal('Dr. Suresh Naidu', 'Cardiology')">
+          📅 Book Appointment
+        </button>
+      </div>
+    </div>
+
+    <div class="doctor-card" data-category="cardiology">
+      <div class="card-top">
+        <div class="availability-badge">● Available</div>
+        <img class="doctor-avatar" src="https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg" alt="Dr. Meena Iyer">
+        <div class="doctor-name">Dr. Meena Iyer</div>
+        <div class="doctor-specialty">❤️ Cardiology</div>
+      </div>
+      <div class="card-body">
+        <div class="slots-label">Pick a slot</div>
+        <div class="timings">
+          <span class="slot" onclick="selectSlot(this)">3:00 PM</span>
+          <span class="slot" onclick="selectSlot(this)">3:30 PM</span>
+        </div>
+        <button class="book-btn" onclick="openModal('Dr. Meena Iyer', 'Cardiology')">
+          📅 Book Appointment
+        </button>
+      </div>
+    </div>
+
+    <!-- ORTHOPEDIC -->
+    <div class="doctor-card" data-category="orthopedic">
+      <div class="card-top">
+        <div class="availability-badge">● Available</div>
+        <img class="doctor-avatar" src="https://images.pexels.com/photos/8376277/pexels-photo-8376277.jpeg" alt="Dr. Anil Reddy">
+        <div class="doctor-name">Dr. Anil Reddy</div>
+        <div class="doctor-specialty">🦴 Orthopedic</div>
+      </div>
+      <div class="card-body">
+        <div class="slots-label">Pick a slot</div>
+        <div class="timings">
+          <span class="slot" onclick="selectSlot(this)">4:00 PM</span>
+          <span class="slot" onclick="selectSlot(this)">4:30 PM</span>
+        </div>
+        <button class="book-btn" onclick="openModal('Dr. Anil Reddy', 'Orthopedic')">
+          📅 Book Appointment
+        </button>
+      </div>
+    </div>
+
+    <div class="doctor-card" data-category="orthopedic">
+      <div class="card-top">
+        <div class="availability-badge">● Available</div>
+        <img class="doctor-avatar" src="https://images.pexels.com/photos/8460157/pexels-photo-8460157.jpeg" alt="Dr. Mahesh Rao">
+        <div class="doctor-name">Dr. Mahesh Rao</div>
+        <div class="doctor-specialty">🦴 Orthopedic</div>
+      </div>
+      <div class="card-body">
+        <div class="slots-label">Pick a slot</div>
+        <div class="timings">
+          <span class="slot" onclick="selectSlot(this)">5:00 PM</span>
+          <span class="slot" onclick="selectSlot(this)">5:30 PM</span>
+        </div>
+        <button class="book-btn" onclick="openModal('Dr. Mahesh Rao', 'Orthopedic')">
+          📅 Book Appointment
+        </button>
+      </div>
+    </div>
+
+    <div class="doctor-card" data-category="orthopedic">
+      <div class="card-top">
+        <div class="availability-badge">● Available</div>
+        <img class="doctor-avatar" src="https://images.pexels.com/photos/6749778/pexels-photo-6749778.jpeg" alt="Dr. Deepak Singh">
+        <div class="doctor-name">Dr. Deepak Singh</div>
+        <div class="doctor-specialty">🦴 Orthopedic</div>
+      </div>
+      <div class="card-body">
+        <div class="slots-label">Pick a slot</div>
+        <div class="timings">
+          <span class="slot" onclick="selectSlot(this)">6:00 PM</span>
+          <span class="slot" onclick="selectSlot(this)">6:30 PM</span>
+        </div>
+        <button class="book-btn" onclick="openModal('Dr. Deepak Singh', 'Orthopedic')">
+          📅 Book Appointment
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalDocName"></h3>
+      <div class="modal-slot-info" id="modalSlotInfo"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="inputName" placeholder="e.g. Arjun Mehta">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input class="form-input" type="tel" id="inputPhone" placeholder="e.g. +91 9876543210">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason for Visit <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input class="form-input" type="text" id="inputReason" placeholder="e.g. Routine checkup">
+      </div>
+      <button class="confirm-btn" onclick="confirmBooking()">✓ Confirm Appointment</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✅</span>
+  <span id="toastMsg">Appointment confirmed!</span>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  © 2025 <span>MedBook</span> — Seamless Healthcare Scheduling
+</footer>
+
+<script>
+let selectedSlot = "";
+let selectedDoctor = "";
+let currentCard = null;
+
+function selectSlot(el) {
+  if (el.classList.contains("booked")) return;
+  // Only deselect within same card
+  const card = el.closest(".doctor-card");
+  card.querySelectorAll(".slot").forEach(s => s.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedSlot = el.innerText;
+  currentCard = card;
+}
+
+function openModal(docName, specialty) {
+  if (!selectedSlot) {
+    shakeCards();
+    return;
+  }
+  selectedDoctor = docName;
+  document.getElementById("modalDocName").textContent = docName;
+  document.getElementById("modalSlotInfo").textContent = "🕐 " + selectedSlot + "  ·  " + specialty;
+  document.getElementById("inputName").value = "";
+  document.getElementById("inputPhone").value = "";
+  document.getElementById("inputReason").value = "";
+  document.getElementById("modalOverlay").classList.add("open");
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("open");
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById("modalOverlay")) closeModal();
+}
+
+function confirmBooking() {
+  const name = document.getElementById("inputName").value.trim();
+  const phone = document.getElementById("inputPhone").value.trim();
+  if (!name || !phone) {
+    document.getElementById("inputName").style.borderColor = name ? "var(--border)" : "#E74C3C";
+    document.getElementById("inputPhone").style.borderColor = phone ? "var(--border)" : "#E74C3C";
+    return;
+  }
+  closeModal();
+  // Mark selected slot as booked
+  if (currentCard) {
+    const sel = currentCard.querySelector(".slot.selected");
+    if (sel) {
+      sel.classList.remove("selected");
+      sel.classList.add("booked");
+      sel.onclick = null;
+    }
+  }
+  selectedSlot = "";
+  showToast("Booked for " + name + " with " + selectedDoctor);
+}
+
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  document.getElementById("toastMsg").textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3500);
+}
+
+function shakeCards() {
+  // Animate filter tabs to hint user
+  document.querySelectorAll(".slot:not(.booked)").forEach(s => {
+    s.style.animation = "none";
+    s.offsetHeight;
+    s.style.background = "#FFF3CD";
+    s.style.borderColor = "#FFC107";
+    setTimeout(() => {
+      s.style.background = "";
+      s.style.borderColor = "";
+    }, 1000);
+  });
+}
+
+function filterDoctors(cat, btn) {
+  document.querySelectorAll(".filter-tab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  let delay = 0;
+  document.querySelectorAll(".doctor-card").forEach(card => {
+    const show = cat === "all" || card.dataset.category === cat;
+    if (show) {
+      card.style.display = "block";
+      card.style.animation = "none";
+      card.offsetHeight;
+      card.style.animation = `fadeUp 0.35s ease ${delay}ms both`;
+      delay += 60;
+    } else {
+      card.style.display = "none";
+    }
+  });
+}
+
+// Reset input border colors on typing
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".form-input").forEach(input => {
+    input.addEventListener("input", () => input.style.borderColor = "");
+  });
+});
+</script>
+</body>
+</html>
